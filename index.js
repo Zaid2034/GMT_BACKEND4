@@ -42,7 +42,7 @@ app.post ('/signup', async (req, res) => {
     const body = req.body;
     const {success} = signUpSchema.safeParse (req.body);
     if (!success) {
-      return res.json ({
+      return res.status(400).json ({
         message: 'Email already taken/ Incorrect inputs',
       });
     }
@@ -68,7 +68,10 @@ app.post ('/signup', async (req, res) => {
       token: token,
     });
   } catch (error) {
-    console.log (error);
+res.status (504).json ({
+  message: `${error} Database error Please contact Zaid`,
+});
+
   }
 });
 
@@ -76,7 +79,7 @@ app.post ('/signIn', async (req, res) => {
   try {
     const {success} = signinBody.safeParse (req.body);
     if (!success) {
-      return res.status (411).json ({
+      return res.status (400).json ({
         message: 'Incorrect inputs',
       });
     }
@@ -99,17 +102,20 @@ app.post ('/signIn', async (req, res) => {
       });
       return;
     }
-    res.status (411).json ({
-      message: 'Error while logging in',
+    res.status(401).json ({
+      message: 'Wrong Credentials',
     });
   } catch (error) {
-    console.log (error);
+res.status (504).json ({
+  message: `${error} Database error Please contact Zaid`,
+});
+
   }
 });
-app.get ('/success', authMiddleware, (req, res) => {
+app.get ('/success', authMiddleware, async(req, res) => {
   try {
     const userId = req.userId;
-    const user = User.findOne ({
+    const user = await User.findOne ({
       _id: userId,
     });
     if (user) {
@@ -117,13 +123,13 @@ app.get ('/success', authMiddleware, (req, res) => {
         message: 'OK',
       });
     } else {
-      res.json ({
-        message: 'error',
+      res.status(401).json ({
+        message: 'User Unauthorized',
       });
     }
-  } catch (err) {
-    res.json ({
-      error: err,
+  } catch (error) {
+    res.status(504).json ({
+      message: `${error} Database error Please contact Zaid`
     });
   }
 });
@@ -137,9 +143,10 @@ app.post ('/storeToken', async (req, res) => {
     res.json ({
       token,
     });
-  } catch (err) {
-    res.json ({
-      err,
+  } catch (error) {
+    res.status(504).json ({
+      message: `${error} Database error Please contact Zaid`
+
     });
   }
 });
@@ -160,9 +167,9 @@ app.get ('/getToken', async (req, res) => {
         message: 'Token Not Found',
       });
     }
-  } catch (err) {
-    res.json ({
-      err,
+  } catch (error) {
+    res.status(504).json ({
+      message: `${error} Database error Please contact Zaid`
     });
   }
 });
