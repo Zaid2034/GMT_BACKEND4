@@ -47,11 +47,12 @@ app.post ('/signup', async (req, res) => {
       });
     }
     const user = await User.findOne ({
+      email:body.email,
       username: body.username,
     });
 
     if (user) {
-      return res.json ({
+      return res.status(400).json ({
         message: 'Email already taken/ Incorrect inputs',
       });
     }
@@ -68,8 +69,9 @@ app.post ('/signup', async (req, res) => {
       token: token,
     });
   } catch (error) {
-res.status (504).json ({
-  message: `${error} Database error Please contact Zaid`,
+    console.log (error);
+      res.status (504).json ({
+      message: `Email or Username already taken try again with different credential or it can be database error Please contact Zaid`,
 });
 
   }
